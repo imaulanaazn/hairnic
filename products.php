@@ -1,12 +1,15 @@
 <?php 
 include "./config/connection.php";
 include "./process/produk.php";
+include "./process/cart.php";
 session_start();
 
 $limit = isset($_GET['limit']) ? $_GET['limit'] : 8;
 
 $paginatedProducts = getAllProducts($conn, $limit);
 $products = $paginatedProducts['data'];
+
+$cartItemsQty = getCartItemsQty($conn);
 
 function formatIDR($num){
     if(is_numeric($num)){
@@ -41,6 +44,7 @@ function formatIDR($num){
     <!-- Icon Font Stylesheet -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/97e48f7299.js" crossorigin="anonymous"></script>
 
     <!-- Libraries Stylesheet -->
     <link href="assets/lib/animate/animate.min.css" rel="stylesheet">
@@ -81,6 +85,7 @@ function formatIDR($num){
                         <a href="about.php" class="nav-item nav-link">About</a>
                         <a href="products.php" class="nav-item nav-link active">Products</a>
                         <a href="contact.php" class="nav-item nav-link">Contact</a>
+                        <a href="cart.php" class="nav-item nav-link"><i class="fa-solid fa-cart-shopping"></i><span><?= $cartItemsQty ?></span></a>
                     </div>
                     <a href="" class="btn btn-dark py-2 px-4 d-none d-lg-inline-block">Shop Now</a>
                 </div>
@@ -117,8 +122,8 @@ function formatIDR($num){
                 <?php foreach($products as $product) : ?>
                     <div class="col-md-6 col-lg-3 wow fadeIn" data-wow-delay="0.1s">
                         <div class="product-item text-center border h-100 p-4">
-                            <img class="img-fluid mb-4" src="img/product-1.png" alt="">
                             <div class="mb-2">
+                            <img class="img-fluid mb-4" src="uploads/<?= $product['image_url'] ?>" alt="" style="max-height: 14rem">
                                 <?php for($i = 0; $i < $product['total_reviews']; $i++) : ?>
                                     <small class="fa fa-star text-primary"></small>
                                 <?php endfor?>

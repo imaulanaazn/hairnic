@@ -1,6 +1,7 @@
 <?php
 include "./config/connection.php";
 include "./process/produk.php";
+include "./process/cart.php";
 session_start();
 
 
@@ -9,6 +10,8 @@ if(isset($_POST['subscribe'])){
     $email = $_POST['subscribe'];
     $subscribeMessage = subscribeNewsletter($conn, $email, $redirect);
 }
+
+$cartItemsQty = getCartItemsQty($conn);
 
 ?>
 
@@ -35,6 +38,7 @@ if(isset($_POST['subscribe'])){
     <!-- Icon Font Stylesheet -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/97e48f7299.js" crossorigin="anonymous"></script>
 
     <!-- Libraries Stylesheet -->
     <link href="assets/lib/animate/animate.min.css" rel="stylesheet">
@@ -75,6 +79,7 @@ if(isset($_POST['subscribe'])){
                         <a href="about.php" class="nav-item nav-link active">About</a>
                         <a href="products.php" class="nav-item nav-link">Products</a>
                         <a href="contact.php" class="nav-item nav-link">Contact</a>
+                        <a href="cart.php" class="nav-item nav-link"><i class="fa-solid fa-cart-shopping"></i><span><?= $cartItemsQty ?></span></a>
                     </div>
                     <a href="" class="btn btn-dark py-2 px-4 d-none d-lg-inline-block">Shop Now</a>
                 </div>

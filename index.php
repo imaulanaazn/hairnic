@@ -4,13 +4,13 @@ include './process/produk.php';
 include "./process/cart.php";
 session_start();
 
-$session_id = session_id();
-
 $todayDeals = getTodayDeals($conn);
 $todayDeal = $todayDeals[0];
 
 $paginatedProducts = getAllProducts($conn, 4);
 $feedbacks = getAllFeedback($conn);
+
+$cartItemsQty = getCartItemsQty($conn);
 
 function formatIDR($num){
     if(is_numeric($num)){
@@ -27,11 +27,13 @@ if(isset($_POST['subscribe'])){
     $subscribeMessage = subscribeNewsletter($conn, $email, $redirect);
 }
 
-if(isset($_POST['cart']) && isset($_POST['productId'])){
-    $productId = $_POST['productId'];
+if(isset($_POST['cart']) && isset($_POST['product_id'])){
+    $productId = $_POST['product_id'];
     $quantity = 1;
-    $result = addToCart($conn, $productId, $quantity);
+    $result = addToCart($conn, $productId, $quantity, "Location: index.php#product_list");
 }
+
+
 
 ?>
 
@@ -58,6 +60,7 @@ if(isset($_POST['cart']) && isset($_POST['productId'])){
     <!-- Icon Font Stylesheet -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/97e48f7299.js" crossorigin="anonymous"></script>
 
     <!-- Libraries Stylesheet -->
     <link href="assets/lib/animate/animate.min.css" rel="stylesheet">
@@ -80,6 +83,8 @@ if(isset($_POST['cart']) && isset($_POST['productId'])){
     </div>
     <!-- Spinner End -->
 
+ 
+
     <!-- Navbar Start -->
     <div class="container-fluid sticky-top">
         <div class="container">
@@ -97,6 +102,7 @@ if(isset($_POST['cart']) && isset($_POST['productId'])){
                         <a href="about.php" class="nav-item nav-link">About</a>
                         <a href="products.php" class="nav-item nav-link">Products</a>
                         <a href="contact.php" class="nav-item nav-link">Contact</a>
+                        <a href="cart.php" class="nav-item nav-link"><i class="fa-solid fa-cart-shopping"></i><span><?= $cartItemsQty ?></span></a>
                     </div>
                     <a href="" class="btn btn-dark py-2 px-4 d-none d-lg-inline-block">Shop Now</a>
                 </div>
@@ -350,7 +356,7 @@ if(isset($_POST['cart']) && isset($_POST['productId'])){
 
 
     <!-- Product Start -->
-    <div class="container-fluid py-5">
+    <div class="container-fluid py-5" id="product_list">
         <div class="container">
             <div class="mx-auto text-center wow fadeIn" data-wow-delay="0.1s" style="max-width: 600px;">
                 <h1 class="text-primary mb-3"><span class="fw-light text-dark">Our Natural</span> Hair Products</h1>
@@ -360,7 +366,7 @@ if(isset($_POST['cart']) && isset($_POST['productId'])){
                 <?php foreach($paginatedProducts['data'] as $product): ?>
                 <div class="col-md-6 col-lg-3 wow fadeIn" data-wow-delay="0.1s">
                     <div class="product-item text-center border h-100 p-4">
-                        <img class="img-fluid mb-4" src="assets/img/product-1.png" alt="">
+                        <img class="img-fluid mb-4" src="uploads/<?= $product['image_url'] ?>" alt="">
                         <div class="mb-2">
                             <?php for( $i = 0; $i < (int) $product['avg_rating']; $i++) :?>
                                 <small class="fa fa-star text-primary"></small>
@@ -369,7 +375,11 @@ if(isset($_POST['cart']) && isset($_POST['productId'])){
                         </div>
                         <a href="" class="h6 d-inline-block mb-2"><?= $product['name'] ?></a>
                         <h5 class="text-primary mb-3"><?= formatIDR($product['price']) ?></h5>
-                        <a href="" class="btn btn-outline-primary px-3">Add To Cart</a>
+                        <form action="index.php" method="POST">
+                            <input type="text" name="cart" value="true" hidden>
+                            <input type="number" name="product_id" value="<?= $product['product_id'] ?>" hidden>
+                            <button type="submit" class="btn btn-outline-primary px-3">Add To Cart</button>
+                        </form>
                     </div>
                 </div>
                 <?php endforeach;?>
